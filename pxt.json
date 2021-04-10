@@ -2,12 +2,21 @@
     "name": "blaster",
     "description": "",
     "dependencies": {
-        "core": "*",
-        "microphone": "*"
+        "core": "*"
     },
     "files": [
         "main.ts",
-        "README.md"
+        "README.md",
+        "sprite.ts",
+        "joystick.ts",
+        "display.ts",
+        "bitmaps.ts",
+        "gameManager.ts",
+        "spriteManager.ts",
+        "levels.ts",
+        "level1.ts",
+        "goodies.ts",
+        "baddies.ts"
     ],
     "testFiles": [
         "test.ts"

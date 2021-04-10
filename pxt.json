@@ -2,7 +2,9 @@
     "name": "blaster",
     "description": "",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "microphone": "*",
+        "radio": "*"
     },
     "files": [
         "main.ts",

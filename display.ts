@@ -11,7 +11,7 @@ namespace Display {
     const _DISPLAYTEST = 15 // force all LEDs light up, no usage here
 
     let _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
-    let _matrixNum = 4 // number of MAX7219 matrix linked in the chain
+    let _matrixNum = 8 // number of MAX7219 matrix linked in the chain
     let _displayArray: number[] = [] // display array to show accross all matrixs
     let _rotation = 2 // rotate matrixs display for 4-in-1 modules
     let _reversed = true // reverse matrixs display order for 4-in-1 modules

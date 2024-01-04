@@ -3,6 +3,7 @@ let _BOUNDS: number[] = [0,0,31,7];
 namespace Display {
 
     const _NOOP = 0 // no-op (do nothing, doesn't change current status)
+    const _BLIP=9
     const _DIGIT = [1, 2, 3, 4, 5, 6, 7, 8] // digit (LED column)
     const _DECODEMODE = 9 // decode mode (1=on, 0-off; for 7-segment display on MAX7219, no usage here)
     const _INTENSITY = 10 // intensity (LED brightness level, 0-15)
@@ -145,7 +146,7 @@ namespace Display {
     /**
     * (internal function) write command and data to all MAX7219s
     */
-    function _registerAll(addressCode: number, data: number) {
+    export function _registerAll(addressCode: number, data: number) {
         pins.digitalWritePin(_pinCS, 0) // LOAD=LOW, start to receive commands
         for (let i = 0; i < _matrixNum; i++) {
             // when a MAX7219 received a new command/data set

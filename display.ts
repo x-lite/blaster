@@ -21,14 +21,14 @@ namespace Display {
         displayRowOne.render(sprites);
     }
 
-    export class DisplayRow {
+    class DisplayRow {
 
         _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
         _matrixNum = 4 // number of MAX7219 matrix linked in the chain
         _displayArray: number[] = [] // display array to show accross all matrixs
         _rotation = 2 // rotate matrixs display for 4-in-1 modules
         _reversed = true // reverse matrixs display order for 4-in-1 modules
-        _vramBuilders: VramBuilder[] = [];
+        _vramBuilder: VramBuilder = new VramBuilder()
         _cs:DigitalPin;
         _mosi:DigitalPin;
         _miso:DigitalPin;
@@ -57,11 +57,11 @@ namespace Display {
             this._sendCommandToAll(_SCANLIMIT, 7) // set scan limit to 7 (column 0-7)
             this._sendCommandToAll(_INTENSITY, 5) // set brightness to 5
             this._sendCommandToAll(_SHUTDOWN, 1) // turn on
-            this._vramBuilders = [];
-            // initialize MAX7219s
-            for (let i = 0; i < this._matrixNum; i++) {
-                this._vramBuilders.push(new VramBuilder(i))
-            }
+            // this._vramBuilders = [];
+            // // initialize MAX7219s
+            // for (let i = 0; i < this._matrixNum; i++) {
+            //     this._vramBuilders.push(new VramBuilder(i))
+            // }
         }
 
         public render(sprites: Grafix.Sprite[]) {
@@ -98,8 +98,8 @@ namespace Display {
             })
 
             buckets.forEach(function (sprites: Grafix.Sprite[], builderId: number ) {
-                //let vRamBuilder = this._vramBuilders[builderId];
-                // let vram = vRamBuilder.buildNewVram(sprites)
+                
+                let vram = this._vramBuilder.buildNewVram(sprites)
                 // //Write vram to screen
                 // vram.forEach(function (bitMask: number, index: number) {
                 //     this._renderOnSingleMatrix(8 - index, bitMask, builderId);
@@ -150,24 +150,18 @@ namespace Display {
      */
     class VramBuilder {
 
-        _id: number;  //This is required to ensure the node can determine its x,y position in the world
-
-        constructor(id: number) {
-            this._id = id;
-        }
-
-        public buildNewVram(sprites: Grafix.Sprite[]): number [] {
+        public buildNewVram(sprites: Grafix.Sprite[], matrixId: number): number [] {
             let vram = [0,0,0,0,0,0,0,0];
             
             sprites.forEach(function (sprite: Grafix.Sprite, index: number) {
-                this._addSpriteToVram(sprite, vram);
+                this._addSpriteToVram(sprite, vram, matrixId);
             });
             
             return vram;
             
         }
 
-        private _addSpriteToVram(sprite: Grafix.Sprite, vram: number[]) {
+        private _addSpriteToVram(sprite: Grafix.Sprite, vram: number[], matrixId: number) {
             let bitmap = sprite.getBitmap();
             let xPos = sprite.getXPosition();
             let yPos = sprite.getYPosition();
@@ -176,24 +170,24 @@ namespace Display {
             for (let bitmapRow = 0; bitmapRow < bitmap.length ; bitmapRow++) {
                 if(bitmapRow + yPos > 7) continue;
 
-                let bitMapBitMask = this._toBitMask(bitmap[bitmap.length-(bitmapRow+1)], xPos);
+                let bitMapBitMask = this._toBitMask(bitmap[bitmap.length-(bitmapRow+1)], xPos, matrixId);
                 //add to whatever value is already in vram for this row - by using a bitwise OR
                 vram[yPos+bitmapRow] = vram[yPos+bitmapRow] | bitMapBitMask; 
             }
         }
 
 
-        private _toBitMask(bitmapRow: number[], xPos: number) : number {
+        private _toBitMask(bitmapRow: number[], xPos: number, matrixId: number) : number {
 
             let bitMask: number = 0;
             let nodeWidth: number = 8;
-            let minX = this._id * nodeWidth; //This is the minimum xposition we'll consider for this node. Smaller x values will have been rendered on a different node!
+            let minX = matrixId * nodeWidth; //This is the minimum xposition we'll consider for this node. Smaller x values will have been rendered on a different node!
 
             //Check each value in the BITMAP row to create a bit mask
             for(let i = 0 ; i < bitmapRow.length ; i++) {
                 //Does the bit have a value and is it on this node
                 if(bitmapRow[i] && ((xPos + i) >= minX) ) {
-                    let exponent = 7-(xPos+i-(nodeWidth*this._id));
+                    let exponent = 7-(xPos+i-(nodeWidth*matrixId));
                     bitMask += 2 ** exponent;
                 }
             }

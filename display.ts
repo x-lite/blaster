@@ -99,7 +99,7 @@ namespace Display {
 
             buckets.forEach(function (sprites: Grafix.Sprite[], matrixId: number ) {
                 
-                let vram = this._vramBuilder.buildNewVram(sprites)
+                let vram: number[] = this._vramBuilder.buildNewVram(sprites)
                 // //Write vram to screen
                 // vram.forEach(function (bitMask: number, index: number) {
                 //    // this._renderOnSingleMatrix(8 - index, bitMask, matrixId);

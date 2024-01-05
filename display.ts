@@ -12,9 +12,11 @@ namespace Display {
     const _DISPLAYTEST = 15 // force all LEDs light up, no usage here
 
     let displayRowOne: DisplayRow;
+    let displayRowTwo: DisplayRow;
 
     export function init(cs: DigitalPin, mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
         displayRowOne = new DisplayRow("1", cs, mosi, miso, sck);
+       // displayRowTwo = new DisplayRow("2", cs, mosi, miso, sck);
     }
 
     export function render(sprites: Grafix.Sprite[]) {
@@ -36,6 +38,7 @@ namespace Display {
 
         constructor(id: string, cs: DigitalPin, mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
             this._cs = cs;
+            this._pinCS = cs;
             this._mosi = mosi;
             this._miso = miso;
             this._sck = sck;

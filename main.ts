@@ -1,5 +1,5 @@
-let MATRIX_LOAD_PIN: DigitalPin = DigitalPin.P16;
-let MATRIX_INPUT_PIN: DigitalPin = DigitalPin.P15;
+let MATRIX_LOAD_PIN: DigitalPin = DigitalPin.P8;
+let MATRIX_INPUT_PIN: DigitalPin = DigitalPin.P9;
 let MATRIX_UNUSED_PIN: DigitalPin = DigitalPin.P14;
 let MATRIX_CLOCK_PIN: DigitalPin = DigitalPin.P13;
 

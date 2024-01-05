@@ -3,7 +3,7 @@ let _BOUNDS: number[] = [0,0,31,7];
 namespace Display {
 
     const _NOOP = 0 // no-op (do nothing, doesn't change current status)
-    const _BLIP=9
+    const _BLIP = 9
     const _DIGIT = [1, 2, 3, 4, 5, 6, 7, 8] // digit (LED column)
     const _DECODEMODE = 9 // decode mode (1=on, 0-off; for 7-segment display on MAX7219, no usage here)
     const _INTENSITY = 10 // intensity (LED brightness level, 0-15)
@@ -11,104 +11,162 @@ namespace Display {
     const _SHUTDOWN = 12 // turn on (1) or off (0)
     const _DISPLAYTEST = 15 // force all LEDs light up, no usage here
 
-    let _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
-    let _matrixNum = 8 // number of MAX7219 matrix linked in the chain
-    let _displayArray: number[] = [] // display array to show accross all matrixs
-    let _rotation = 2 // rotate matrixs display for 4-in-1 modules
-    let _reversed = true // reverse matrixs display order for 4-in-1 modules
-    let _nodes: Node[] = [];
-    
-    
+    let displayRowOne: DisplayRow;
 
     export function init(cs: DigitalPin, mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
-        // set internal variables        
-        _pinCS = cs
- 
-        // prepare display array (for displaying texts; add extra 8 columns at each side as buffers)
-        for (let i = 0; i < (_matrixNum + 2) * 8; i++)  _displayArray.push(0)
-        // set micro:bit SPI
-        pins.spiPins(mosi, miso, sck)
-        pins.spiFormat(8, 3)
-        pins.spiFrequency(1000000)
-        // initialize MAX7219s
-        _registerAll(_SHUTDOWN, 0) // turn off
-        _registerAll(_DISPLAYTEST, 0) // test mode off
-        _registerAll(_DECODEMODE, 0) // decode mode off
-        _registerAll(_SCANLIMIT, 7) // set scan limit to 7 (column 0-7)
-        _registerAll(_INTENSITY, 5) // set brightness to 5
-        _registerAll(_SHUTDOWN, 1) // turn on
-
-        for(let i = 0; i < _matrixNum; i++) {
-            _nodes.push(new Node(i))
-        }
+        displayRowOne = new DisplayRow("1", cs, mosi, miso, sck);
     }
 
-    export function renderAll(sprites: Grafix.Sprite[]) {
+    export function render(sprites: Grafix.Sprite[]) {
+        displayRowOne.render(sprites);
+    }
 
-        let bucket1: Grafix.Sprite[] = [];
-        let bucket2: Grafix.Sprite[] = [];
-        let bucket3: Grafix.Sprite[] = [];
-        let bucket4: Grafix.Sprite[] = [];
+    export class DisplayRow {
 
-        let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4];
+        _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
+        _matrixNum = 4 // number of MAX7219 matrix linked in the chain
+        _displayArray: number[] = [] // display array to show accross all matrixs
+        _rotation = 2 // rotate matrixs display for 4-in-1 modules
+        _reversed = true // reverse matrixs display order for 4-in-1 modules
+        _vramBuilders: VramBuilder[] = [];
+        _cs:DigitalPin;
+        _mosi:DigitalPin;
+        _miso:DigitalPin;
+        _sck:DigitalPin;
 
-        //first bucket the sprites by node!
+        constructor(id: string, cs: DigitalPin, mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
+            this._cs=cs;
+            this._mosi=mosi;
+            this._miso=miso;
+            this._sck=sck;
+            this._activateSpi();
+            this._reset();
+        }
+
+        /* Activate this module as the one that is writing to SPI */
+        _activateSpi() {
+            pins.spiPins(this._mosi, this._miso, this._sck)
+            pins.spiFormat(8, 3)
+            pins.spiFrequency(1000000)
+        }
+
+        _reset() {
+            this._sendCommandToAll(_SHUTDOWN, 0) // turn off
+            this._sendCommandToAll(_DISPLAYTEST, 0) // test mode off
+            this._sendCommandToAll(_DECODEMODE, 0) // decode mode off
+            this._sendCommandToAll(_SCANLIMIT, 7) // set scan limit to 7 (column 0-7)
+            this._sendCommandToAll(_INTENSITY, 5) // set brightness to 5
+            this._sendCommandToAll(_SHUTDOWN, 1) // turn on
+            this._vramBuilders = [];
+            // initialize MAX7219s
+            for (let i = 0; i < this._matrixNum; i++) {
+                this._vramBuilders.push(new VramBuilder(i))
+            }
+        }
+
+        public render(sprites: Grafix.Sprite[]) {
+
+            let bucket1: Grafix.Sprite[] = [];
+            let bucket2: Grafix.Sprite[] = [];
+            let bucket3: Grafix.Sprite[] = [];
+            let bucket4: Grafix.Sprite[] = [];
+
+            let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4];
+
+            //first bucket the sprites by node!
             //if a sprite is spanning multiple nodes then we need to add it to multiple buckets
             //TODO - currently only support 2 bucket span - should try to handle 4 bucket span!
-        sprites.forEach(function (sprite: Grafix.Sprite, index: number) {
-            if(sprite.getXPosition() < 8) {
-                bucket1.push(sprite);
-                if(sprite.getXPosition()+sprite.getWidth() >= 8) {
+            sprites.forEach(function (sprite: Grafix.Sprite, index: number) {
+                if (sprite.getXPosition() < 8) {
+                    bucket1.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 8) {
+                        bucket2.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 16) {
                     bucket2.push(sprite);
-                } 
-            } else if (sprite.getXPosition() < 16) {
-                bucket2.push(sprite);
-                if(sprite.getXPosition()+sprite.getWidth() >= 16) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 16) {
+                        bucket3.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 24) {
                     bucket3.push(sprite);
-                } 
-            } else if (sprite.getXPosition() < 24) {
-                bucket3.push(sprite);
-                if(sprite.getXPosition()+sprite.getWidth() >= 24) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 24) {
+                        bucket4.push(sprite);
+                    }
+                } else {
                     bucket4.push(sprite);
-                } 
-            } else {
-                bucket4.push(sprite);
+                }
+            })
+
+            buckets.forEach(function (sprites: Grafix.Sprite[], node: number ) {
+                let vram = this._nodes[node].buildNewVram(sprites)
+                //Write vram to screen
+                vram.forEach(function (bitMask: number, index: number) {
+                    this._renderOnSpecificNode(8 - index, bitMask, this._id);
+                });
+            });
+        }
+
+        /**
+        * (internal function) write command and data to all MAX7219s
+        */
+        _sendCommandToAll(addressCode: number, data: number) {
+            pins.digitalWritePin(this._pinCS, 0) // LOAD=LOW, start to receive commands
+            for (let i = 0; i < this._matrixNum; i++) {
+                // when a MAX7219 received a new command/data set
+                // the previous one would be pushed to the next matrix along the chain via DOUT
+                pins.spiWrite(addressCode) // command (8 bits)
+                pins.spiWrite(data) //data (8 bits)
             }
-        })
+            pins.digitalWritePin(this._pinCS, 1) // LOAD=HIGH, commands take effect
+        }
 
-        buckets.forEach(_renderAll);
-    }
+        /**
+        * (internal function) write command and data to a specific MAX7219 (index 0=farthest on the chain)
+        */
+        _renderOnSingleMatrix(addressCode: number, data: number, nodeNumber: number) {
+            if (nodeNumber <= this._matrixNum - 1) {
+                pins.digitalWritePin(this._pinCS, 0) // LOAD=LOW, start to receive commands
+                for (let i = 0; i < this._matrixNum; i++) {
+                    // when a MAX7219 received a new command/data set
+                    // the previous one would be pushed to the next matrix along the chain via DOUT
+                    if (i == nodeNumber) { // send change to target
+                        pins.spiWrite(addressCode) // command (8 bits)
+                        pins.spiWrite(data) //data (8 bits)
+                    } else { // do nothing to non-targets
+                        pins.spiWrite(_NOOP)
+                        pins.spiWrite(0)
+                    }
+                }
+                pins.digitalWritePin(this._pinCS, 1) // LOAD=HIGH, commands take effect
+            }
+        }
+    }//End of DisplayRow
 
+    /*
+     * Class that converts sprites into vram for an allocated matrix
+     * The id of the builder indicates which matrix to build for and implies its position index
+     * the 2D 'display space'
+     */
+    class VramBuilder {
 
-    function _renderAll(sprites: Grafix.Sprite[], node: number) {
-        _nodes[node].render(sprites);
-    }
-
-    class Node {
-
-        _id: number;
-        _currentVram: number[] = [0,0,0,0,0,0,0,0];
-        _newVram: number[];
+        _id: number;  //This is required to ensure the node can determine its x,y position in the world
 
         constructor(id: number) {
             this._id = id;
         }
 
-        public render(sprites: Grafix.Sprite[]) {
+        public buildNewVram(sprites: Grafix.Sprite[]): number [] {
             let vram = [0,0,0,0,0,0,0,0];
             
             sprites.forEach(function (sprite: Grafix.Sprite, index: number) {
                 this._addSpriteToVram(sprite, vram);
             });
             
-            //Write vram to screen
-            vram.forEach(function (mask: number, index: number) {
-                _registerForOne(8-index, mask, this._id);
-            });
+            return vram;
             
         }
 
-        public _addSpriteToVram(sprite: Grafix.Sprite, vram: number[]) {
+        private _addSpriteToVram(sprite: Grafix.Sprite, vram: number[]) {
             let bitmap = sprite.getBitmap();
             let xPos = sprite.getXPosition();
             let yPos = sprite.getYPosition();
@@ -143,46 +201,5 @@ namespace Display {
         }
     }
 
-    /**
-    * (internal function) write command and data to all MAX7219s
-    */
-    export function _registerAll(addressCode: number, data: number) {
-        pins.digitalWritePin(_pinCS, 0) // LOAD=LOW, start to receive commands
-        for (let i = 0; i < _matrixNum; i++) {
-            // when a MAX7219 received a new command/data set
-            // the previous one would be pushed to the next matrix along the chain via DOUT
-            pins.spiWrite(addressCode) // command (8 bits)
-            pins.spiWrite(data) //data (8 bits)
-        }
-        pins.digitalWritePin(_pinCS, 1) // LOAD=HIGH, commands take effect
-    }
-
-    /**
-    * (internal function) write command and data to a specific MAX7219 (index 0=farthest on the chain)
-    */
-    export function _registerForOne(addressCode: number, data: number, matrixIndex: number) {
-        if (matrixIndex <= _matrixNum - 1) {
-            pins.digitalWritePin(_pinCS, 0) // LOAD=LOW, start to receive commands
-            for (let i = 0; i < _matrixNum; i++) {
-                // when a MAX7219 received a new command/data set
-                // the previous one would be pushed to the next matrix along the chain via DOUT
-                if (i == matrixIndex) { // send change to target
-                    pins.spiWrite(addressCode) // command (8 bits)
-                    pins.spiWrite(data) //data (8 bits)
-                } else { // do nothing to non-targets
-                    pins.spiWrite(_NOOP)
-                    pins.spiWrite(0)
-                }
-            }
-            pins.digitalWritePin(_pinCS, 1) // LOAD=HIGH, commands take effect
-        }
-    }
-
-    /**
-    * Set brightness level of LEDs on all MAX7219s
-    */
-    export function brightnessAll(level: number) {
-        _registerAll(_INTENSITY, level)
-    }
 
 }

@@ -60,7 +60,7 @@ class GameManager {
         let tickInfo = new TickInfo(delta, joystickData, collisionInfo)
         
         this._levelManager.getLevel().tick(tickInfo);   //TODO - is it better to call tick on the manager, or ask for level and call tick on the level?
-        Display.renderAll(this._sprites); 
+        Display.render(this._sprites); 
         basic.pause(this._pause);
         
     }

@@ -1,4 +1,4 @@
-let _BOUNDS: number[] = [0, 0, 31, 7];
+let _BOUNDS: number[] = [0, 0, 59, 7];
 
 namespace Display {
 
@@ -12,9 +12,8 @@ namespace Display {
     const _DISPLAYTEST = 15 // force all LEDs light up, no usage here
 
     let displayRowOne: DisplayRow;
-    let displayRowTwo: DisplayRow;
     let activeDisplayRow: DisplayRow;
-    let counter: number = 0
+  
 
     export function init(cs: DigitalPin,  mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
         displayRowOne = new DisplayRow("1", cs, mosi, miso, sck);
@@ -22,23 +21,13 @@ namespace Display {
     }
 
     export function render(sprites: Grafix.Sprite[]) {
-        counter++;
-        // if(counter == 100) {
-        //     activeDisplayRow = displayRowTwo;
-        //     activeDisplayRow.activateSpi();
-        // }
-        // if(counter == 200) {
-        //     activeDisplayRow = displayRowOne;
-        //     activeDisplayRow.activateSpi();
-        //     counter = 0;
-        // }
         activeDisplayRow.render(sprites);
     }
 
     class DisplayRow {
 
         _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
-        _matrixNum = 4 // number of MAX7219 matrix linked in the chain
+        _matrixNum = 8 // number of MAX7219 matrix linked in the chain
         _displayArray: number[] = [] // display array to show accross all matrixs
         _rotation = 2 // rotate matrixs display for 4-in-1 modules
         _reversed = true // reverse matrixs display order for 4-in-1 modules
@@ -80,8 +69,12 @@ namespace Display {
             let bucket2: Grafix.Sprite[] = [];
             let bucket3: Grafix.Sprite[] = [];
             let bucket4: Grafix.Sprite[] = [];
+            let bucket5: Grafix.Sprite[] = [];
+            let bucket6: Grafix.Sprite[] = [];
+            let bucket7: Grafix.Sprite[] = [];
+            let bucket8: Grafix.Sprite[] = [];
 
-            let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4];
+            let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4, bucket5, bucket6, bucket7, bucket8];
 
             //first bucket the sprites by node!
             //if a sprite is spanning multiple nodes then we need to add it to multiple buckets
@@ -102,8 +95,28 @@ namespace Display {
                     if (sprite.getXPosition() + sprite.getWidth() >= 24) {
                         bucket4.push(sprite);
                     }
-                } else {
+                } else if (sprite.getXPosition() < 32) {
                     bucket4.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 24) {
+                        bucket5.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 40) {
+                    bucket5.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 32) {
+                        bucket6.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 48) {
+                    bucket6.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 40) {
+                        bucket7.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 56) {
+                    bucket7.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 48) {
+                        bucket8.push(sprite);
+                    }
+                }else {
+                    bucket8.push(sprite);
                 }
             })
 

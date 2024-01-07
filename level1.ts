@@ -23,7 +23,7 @@ class Level1 implements Level {
         this._goodyManager = goodyManager;
         this._goody = new XWing("R2D2", 0,3,0,0, rocket, this.GOODY, this.R2D2_STRENGTH, _BOUNDS, rocketHit, this._goodyManager);
         this._goodyManager.newSprite(this._goody);
-        this._baddy = new TieFighter("Vader", getRandomIntInclusive(16, 25),getRandomIntInclusive(2,4),-1,getRandomIntInclusive(-1, 1), tie, this.BADDY, this.VADER_STRENGTH, [8,0,31,7], tieHitBitmap, this._goody, this._baddyManager);
+        this._baddy = new TieFighter("Vader", getRandomIntInclusive(16, 25),getRandomIntInclusive(2,4),-1,getRandomIntInclusive(-1, 1), tie, this.BADDY, this.VADER_STRENGTH, [8,0,60,7], tieHitBitmap, this._goody, this._baddyManager);
         this._baddyManager.newSprite(this._baddy);
         this._baddiesKilled = 0;
         for(let i=0; i<5;i++) {
@@ -60,7 +60,7 @@ class Level1 implements Level {
                 this._baddy = new TieFighter("Vader", 26, getRandomIntInclusive(2,4),-1,getRandomIntInclusive(-1, 1), tie, this.BADDY, this.VADER_STRENGTH, [4,0,31,7], tieHitBitmap, this._goody, this._baddyManager);
                 this._baddyManager.newSprite(this._baddy);               
             }  else {
-                this._baddy = new BombBomb("The Bomb Bomb", 25, 0, 0, 0, theBombBomb, this.BADDY, 20, [8,0,31,7], theBombBombHit, this._goody, this._baddyManager);
+                this._baddy = new BombBomb("The Bomb Bomb", 25, 0, 0, 0, theBombBomb, this.BADDY, 20, [8,0,63,7], theBombBombHit, this._goody, this._baddyManager);
                 this._baddyManager.newSprite(this._baddy);  
                 this._goody._maxActiveShots = 5;
                 this._levelStage = 2; 

@@ -177,7 +177,7 @@ class LazerRound extends Grafix.Sprite {
             this._vY = -this._vY
         } 
 
-        if(this._pX > 32 || this._pX < 0) {
+        if(this._pX > this._bounds[2] || this._pX < 0) {
             this._isAlive = false
             this._tracker.spriteDied(this)
         }

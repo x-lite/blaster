@@ -56,7 +56,7 @@ class BombBomb extends TieFighter {
             return this._vBar;
         }
         
-        return new TieFighter(this.newSpriteID(), 26, getRandomIntInclusive(2,4),-1, 1, tie, true, 3, [4,0,31,7], tieHitBitmap, this._target, this._tracker);
+        return new TieFighter(this.newSpriteID(), 26, getRandomIntInclusive(2,4),-1, 1, tie, true, 3, [4,0,63,7], tieHitBitmap, this._target, this._tracker);
 
     }
     

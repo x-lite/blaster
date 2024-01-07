@@ -1,5 +1,7 @@
-let MATRIX_LOAD_PIN: DigitalPin = DigitalPin.P8;
-let MATRIX_INPUT_PIN: DigitalPin = DigitalPin.P9;
+let MATRIX_LOAD_PIN_1: DigitalPin = DigitalPin.P16;
+let MATRIX_INPUT_PIN_1: DigitalPin = DigitalPin.P15;
+let MATRIX_LOAD_PIN_2: DigitalPin = DigitalPin.P8;
+let MATRIX_INPUT_PIN_2: DigitalPin = DigitalPin.P9;
 let MATRIX_UNUSED_PIN: DigitalPin = DigitalPin.P14;
 let MATRIX_CLOCK_PIN: DigitalPin = DigitalPin.P13;
 
@@ -13,7 +15,7 @@ function getRandomIntInclusive(min: number,  max: number) {
 }
 
 Joystick.init(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
-Display.init(MATRIX_LOAD_PIN, MATRIX_INPUT_PIN, MATRIX_UNUSED_PIN, MATRIX_CLOCK_PIN);
+Display.init(MATRIX_LOAD_PIN_1, MATRIX_LOAD_PIN_2, MATRIX_INPUT_PIN_1, MATRIX_INPUT_PIN_2, MATRIX_UNUSED_PIN, MATRIX_CLOCK_PIN);
 
 let manager = new GameManager();
 

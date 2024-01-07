@@ -13,14 +13,27 @@ namespace Display {
 
     let displayRowOne: DisplayRow;
     let displayRowTwo: DisplayRow;
+    let activeDisplayRow: DisplayRow;
+    let counter: number = 0
 
-    export function init(cs: DigitalPin, mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
-        displayRowOne = new DisplayRow("1", cs, mosi, miso, sck);
-       // displayRowTwo = new DisplayRow("2", cs, mosi, miso, sck);
+    export function init(cs1: DigitalPin, cs2: DigitalPin, mosi1: DigitalPin, mosi2: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
+        displayRowOne = new DisplayRow("1", cs1, mosi1, miso, sck);
+        //displayRowTwo = new DisplayRow("2", cs2, mosi2, miso, sck);
+        activeDisplayRow = displayRowOne;
     }
 
     export function render(sprites: Grafix.Sprite[]) {
-        displayRowOne.render(sprites);
+        counter++;
+        // if(counter == 100) {
+        //     activeDisplayRow = displayRowTwo;
+        //     activeDisplayRow.activateSpi();
+        // }
+        // if(counter == 200) {
+        //     activeDisplayRow = displayRowOne;
+        //     activeDisplayRow.activateSpi();
+        //     counter = 0;
+        // }
+        activeDisplayRow.render(sprites);
     }
 
     class DisplayRow {
@@ -42,12 +55,12 @@ namespace Display {
             this._mosi = mosi;
             this._miso = miso;
             this._sck = sck;
-            this._activateSpi();
+            this.activateSpi();
             this._reset();
         }
 
         /* Activate this module as the one that is writing to SPI */
-        _activateSpi() {
+        public activateSpi() {
             pins.spiPins(this._mosi, this._miso, this._sck)
             pins.spiFormat(8, 3)
             pins.spiFrequency(1000000)
@@ -63,7 +76,7 @@ namespace Display {
         }
 
         public render(sprites: Grafix.Sprite[]) {
-
+        
             let bucket1: Grafix.Sprite[] = [];
             let bucket2: Grafix.Sprite[] = [];
             let bucket3: Grafix.Sprite[] = [];

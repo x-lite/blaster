@@ -16,9 +16,8 @@ namespace Display {
     let activeDisplayRow: DisplayRow;
     let counter: number = 0
 
-    export function init(cs1: DigitalPin, cs2: DigitalPin, mosi1: DigitalPin, mosi2: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
-        displayRowOne = new DisplayRow("1", cs1, mosi1, miso, sck);
-        //displayRowTwo = new DisplayRow("2", cs2, mosi2, miso, sck);
+    export function init(cs: DigitalPin,  mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin) {
+        displayRowOne = new DisplayRow("1", cs, mosi, miso, sck);
         activeDisplayRow = displayRowOne;
     }
 

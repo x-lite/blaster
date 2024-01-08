@@ -1,4 +1,4 @@
-let _BOUNDS: number[] = [0, 0, 59, 7];
+let _BOUNDS: number[] = [0, 0, 91, 7];
 
 namespace Display {
 
@@ -27,7 +27,7 @@ namespace Display {
     class DisplayRow {
 
         _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
-        _matrixNum = 8 // number of MAX7219 matrix linked in the chain
+        _matrixNum = 12 // number of MAX7219 matrix linked in the chain
         _displayArray: number[] = [] // display array to show accross all matrixs
         _rotation = 2 // rotate matrixs display for 4-in-1 modules
         _reversed = true // reverse matrixs display order for 4-in-1 modules
@@ -73,8 +73,14 @@ namespace Display {
             let bucket6: Grafix.Sprite[] = [];
             let bucket7: Grafix.Sprite[] = [];
             let bucket8: Grafix.Sprite[] = [];
+            let bucket9: Grafix.Sprite[] = [];
+            let bucket10: Grafix.Sprite[] = [];
+            let bucket11: Grafix.Sprite[] = [];
+            let bucket12: Grafix.Sprite[] = [];
 
-            let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4, bucket5, bucket6, bucket7, bucket8];
+            let buckets: Grafix.Sprite[][] = [bucket1, bucket2, bucket3, bucket4, 
+                                                bucket5, bucket6, bucket7, bucket8,
+                                                bucket9, bucket10, bucket11, bucket12];
 
             //first bucket the sprites by node!
             //if a sprite is spanning multiple nodes then we need to add it to multiple buckets
@@ -115,8 +121,28 @@ namespace Display {
                     if (sprite.getXPosition() + sprite.getWidth() >= 48) {
                         bucket8.push(sprite);
                     }
-                }else {
+                } else if (sprite.getXPosition() < 64) {
                     bucket8.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 56) {
+                        bucket9.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 72) {
+                    bucket9.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 64) {
+                        bucket10.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 80) {
+                    bucket10.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 72) {
+                        bucket11.push(sprite);
+                    }
+                } else if (sprite.getXPosition() < 88) {
+                    bucket11.push(sprite);
+                    if (sprite.getXPosition() + sprite.getWidth() >= 80) {
+                        bucket12.push(sprite);
+                    }
+                }else {
+                    bucket12.push(sprite);
                 }
             })
 

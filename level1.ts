@@ -7,7 +7,7 @@ class Level1 implements Level {
     _baddy:Grafix.Sprite;
 
     VADER_STRENGTH: number = 5;
-    R2D2_STRENGTH: number = 10;
+    R2D2_STRENGTH: number = 1000;
     GOODY: boolean = false;
     BADDY: boolean = true;
 
@@ -23,7 +23,7 @@ class Level1 implements Level {
         this._goodyManager = goodyManager;
         this._goody = new XWing("R2D2", 0,3,0,0, rocket, this.GOODY, this.R2D2_STRENGTH, _BOUNDS, rocketHit, this._goodyManager);
         this._goodyManager.newSprite(this._goody);
-        this._baddy = new TieFighter("Vader", getRandomIntInclusive(16, 25),getRandomIntInclusive(2,4),-1,getRandomIntInclusive(-1, 1), tie, this.BADDY, this.VADER_STRENGTH, [8,0,60,7], tieHitBitmap, this._goody, this._baddyManager);
+        this._baddy = new TieFighter("Vader", getRandomIntInclusive(16, 25),getRandomIntInclusive(2,4),-1,getRandomIntInclusive(-1, 1), tie, this.BADDY, this.VADER_STRENGTH, [8,0,92,7], tieHitBitmap, this._goody, this._baddyManager);
         this._baddyManager.newSprite(this._baddy);
         this._baddiesKilled = 0;
         for(let i=0; i<5;i++) {

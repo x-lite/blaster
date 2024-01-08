@@ -28,7 +28,6 @@ namespace Display {
 
         _pinCS = DigitalPin.P16 // LOAD pin, 0=ready to receive command, 1=command take effect
         _matrixNum = 12 // number of MAX7219 matrix linked in the chain
-        _displayArray: number[] = [] // display array to show accross all matrixs
         _rotation = 2 // rotate matrixs display for 4-in-1 modules
         _reversed = true // reverse matrixs display order for 4-in-1 modules
         _vramBuilder: VramBuilder = new VramBuilder()
@@ -103,42 +102,42 @@ namespace Display {
                     }
                 } else if (sprite.getXPosition() < 32) {
                     bucket4.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 24) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 32) {
                         bucket5.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 40) {
                     bucket5.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 32) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 40) {
                         bucket6.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 48) {
                     bucket6.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 40) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 48) {
                         bucket7.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 56) {
                     bucket7.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 48) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 56) {
                         bucket8.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 64) {
                     bucket8.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 56) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 64) {
                         bucket9.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 72) {
                     bucket9.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 64) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 72) {
                         bucket10.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 80) {
                     bucket10.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 72) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 80) {
                         bucket11.push(sprite);
                     }
                 } else if (sprite.getXPosition() < 88) {
                     bucket11.push(sprite);
-                    if (sprite.getXPosition() + sprite.getWidth() >= 80) {
+                    if (sprite.getXPosition() + sprite.getWidth() >= 88) {
                         bucket12.push(sprite);
                     }
                 }else {
